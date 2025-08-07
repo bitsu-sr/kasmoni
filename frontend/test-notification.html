@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification Badge Test</title>
+    <style>
+        .notification-badge-small {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background-color: #dc3545;
+            color: white;
+            border-radius: 50%;
+            min-width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 0 3px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            animation: pulse 2s infinite;
+            z-index: 10;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 50%;
+            right: 0.75rem;
+            transform: translateY(-50%);
+            background-color: #dc3545;
+            color: white;
+            border-radius: 50%;
+            min-width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 0 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 6px rgba(220, 53, 69, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+            }
+        }
+
+        .test-button {
+            position: relative;
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 20px;
+        }
+
+        .dropdown-item {
+            position: relative;
+            padding: 10px 20px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            margin: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Notification Badge Test</h1>
+    
+    <h2>Small Badge (More button)</h2>
+    <button class="test-button">
+        More
+        <span class="notification-badge-small">2</span>
+    </button>
+
+    <h2>Regular Badge (Dropdown items)</h2>
+    <div class="dropdown-item">
+        <span>Messages</span>
+        <span class="notification-badge">2</span>
+    </div>
+
+    <div class="dropdown-item">
+        <span>Profile</span>
+        <span class="notification-badge">2</span>
+    </div>
+
+    <script>
+        console.log('Notification badge test loaded');
+        console.log('Badges should be visible with red background and pulse animation');
+    </script>
+</body>
+</html> 
