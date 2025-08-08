@@ -8,8 +8,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Serve static files from public directory
-app.use(express.static(path.join(__dirname, '../public')));
+// Serve static files from React build
+app.use(express.static(path.join(__dirname, '../build')));
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -29,9 +29,9 @@ app.get('/api/test', (req, res) => {
   });
 });
 
-// Serve index.html for all other routes (SPA fallback)
+// Serve React app for all other routes (SPA fallback)
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/index.html'));
+  res.sendFile(path.join(__dirname, '../build/index.html'));
 });
 
 // Export for Vercel
