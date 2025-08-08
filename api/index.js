@@ -1,12 +1,11 @@
-import express from 'express';
-import cors from 'cors';
+const express = require('express');
+const cors = require('cors');
 
 const app = express();
 
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -17,7 +16,7 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Simple test endpoint
+// Test endpoint
 app.get('/api/test', (req, res) => {
   res.json({
     success: true,
@@ -27,4 +26,4 @@ app.get('/api/test', (req, res) => {
 });
 
 // Export for Vercel
-export default app;
+module.exports = app;
