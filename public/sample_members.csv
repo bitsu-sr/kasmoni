@@ -1,0 +1,6 @@
+firstName,lastName,birthDate,birthplace,address,city,phoneNumber,email,nationalId,nationality,occupation,bankName,accountNumber,registrationDate
+John,Doe,1990-01-15,New York,123 Main St,New York,+1234567890,john.doe@email.com,123456789,American,Engineer,Chase Bank,1234567890,2024-01-01
+Jane,Smith,1985-05-20,Los Angeles,456 Oak Ave,Los Angeles,+1987654321,jane.smith@email.com,987654321,American,Designer,Bank of America,0987654321,2024-01-02
+Mike,Johnson,1992-08-10,Chicago,789 Pine Rd,Chicago,+1555123456,mike.johnson@email.com,456789123,American,Manager,Wells Fargo,4567891230,2024-01-03
+Sarah,Williams,1988-12-03,Houston,321 Elm St,Houston,+1777888999,sarah.williams@email.com,789123456,American,Teacher,Citibank,7891234560,2024-01-04
+David,Brown,1995-03-25,Phoenix,654 Maple Dr,Phoenix,+1666999888,david.brown@email.com,321654987,American,Developer,US Bank,3216549870,2024-01-05 
