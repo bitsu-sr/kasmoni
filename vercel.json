@@ -2,17 +2,5 @@
   "version": 2,
   "buildCommand": "npm run vercel-build",
   "outputDirectory": "frontend/build",
-  "installCommand": "npm install",
-  "builds": [
-    {
-      "src": "backend/src/index.ts",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "backend/src/index.ts"
-    }
-  ]
+  "installCommand": "npm install"
 }
