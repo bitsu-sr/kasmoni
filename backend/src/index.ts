@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
 import { errorHandler, notFound } from './middleware/errorHandler';
 import { authenticateToken } from './middleware/auth';
 import memberRoutes from './routes/members';
@@ -40,6 +41,19 @@ app.get('/api/health', (req, res) => {
     message: 'Sranan Kasmoni API is running',
     timestamp: new Date().toISOString()
   });
+});
+
+// Serve static files from React build
+app.use(express.static(path.join(__dirname, '../../frontend/build')));
+
+// Catch-all handler: send back React's index.html file for any non-API routes
+app.get('*', (req, res) => {
+  // Don't serve React app for API routes
+  if (req.path.startsWith('/api/')) {
+    return notFound(req, res);
+  }
+  
+  res.sendFile(path.join(__dirname, '../../frontend/build/index.html'));
 });
 
 // Error handling middleware

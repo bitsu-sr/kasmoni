@@ -1,151 +1,207 @@
-# Railway Deployment Guide
+# Deployment Guide for Kasmoni
 
-This guide will help you deploy your Kasmoni application to Railway.
+## Overview
+This guide will help you deploy your Kasmoni application using free hosting platforms.
 
-## Prerequisites
+## Deployment Options
 
-- Railway account (sign up at [railway.app](https://railway.app))
-- GitHub repository connected to Railway
-- Node.js 18+ (Railway supports this automatically)
+### Option 1: Vercel (Recommended - Free Tier)
+
+Vercel offers excellent free hosting for full-stack applications.
+
+#### Prerequisites
+- GitHub repository: [bitsu-sr/kasmoni](https://github.com/bitsu-sr/kasmoni)
+- Vercel account (free tier available)
+- Node.js 18+ (handled by Vercel)
+
+#### Deployment Steps
+
+1. **Connect to Vercel**
+   - Go to [Vercel.com](https://vercel.com)
+   - Sign in with your GitHub account
+   - Click "New Project"
+   - Import your repository: `bitsu-sr/kasmoni`
+   - Vercel will automatically detect the `vercel.json` configuration
+
+2. **Configure Environment Variables**
+   In your Vercel project dashboard, go to "Settings" → "Environment Variables" and add:
+
+   ```
+   JWT_SECRET=your-secure-jwt-secret-here
+   NODE_ENV=production
+   ```
+
+   **Important**: Generate a strong JWT secret (you can use a password generator or run `node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"`)
+
+3. **Deploy**
+   - Vercel will automatically start the deployment process
+   - The build process will:
+     - Install dependencies for both backend and frontend
+     - Build the TypeScript backend
+     - Build the React frontend
+     - Deploy both services
+
+4. **Monitor Deployment**
+   - Check the "Deployments" tab in Vercel dashboard
+   - Monitor logs for any build errors
+   - The health check endpoint `/api/health` will verify the deployment
+
+#### Vercel Benefits
+- **Free Tier**: Generous limits (100GB bandwidth/month)
+- **Automatic HTTPS**: SSL certificates included
+- **Global CDN**: Fast loading worldwide
+- **Custom Domains**: Free custom domain support
+- **Serverless Functions**: Perfect for your Express API
+- **Static Hosting**: Optimized for React frontend
+
+### Option 2: Railway (Limited Plan)
+
+If you want to use Railway's database-only plan:
+
+1. **Deploy Database Only**
+   - Use Railway for PostgreSQL database
+   - Set up database connection
+   - Run migrations
+
+2. **Deploy Application Elsewhere**
+   - Deploy backend to Vercel/Render/Heroku
+   - Deploy frontend to Vercel/Netlify
+   - Connect to Railway database
+
+### Option 3: Render (Free Tier)
+
+Render offers free hosting for full-stack applications:
+
+1. **Connect to Render**
+   - Go to [Render.com](https://render.com)
+   - Sign up with GitHub
+   - Create new Web Service
+   - Connect your repository
+
+2. **Configure Build**
+   - **Build Command**: `npm run build`
+   - **Start Command**: `npm start`
+   - **Environment**: Node
+
+3. **Set Environment Variables**
+   ```
+   JWT_SECRET=your-secure-jwt-secret-here
+   NODE_ENV=production
+   ```
+
+## Application Structure
+
+```
+kasmoni/
+├── backend/          # Node.js/Express API
+│   ├── src/         # TypeScript source
+│   ├── dist/        # Compiled JavaScript (generated)
+│   └── database/    # SQLite database files
+├── frontend/        # React application
+│   ├── src/         # React source
+│   └── build/       # Production build (generated)
+├── vercel.json      # Vercel configuration
+├── railway.json     # Railway configuration
+└── package.json     # Root package.json
+```
+
+## Build Process
+
+1. **Install Dependencies**: Both backend and frontend dependencies
+2. **Build Backend**: TypeScript compilation to `backend/dist/`
+3. **Build Frontend**: React build to `frontend/build/`
+4. **Deploy**: Platform-specific deployment process
+
+## Database
+
+- **SQLite**: File-based database stored in `backend/database/`
+- **Persistence**: Vercel provides persistent storage
+- **Backup**: Consider regular database backups
+- **Alternative**: Consider PostgreSQL for production scale
 
 ## Environment Variables
 
-### Required Environment Variables
-
-Set these in your Railway project dashboard:
-
-```
-JWT_SECRET=your-super-secret-jwt-key-here
-NODE_ENV=production
-```
-
-### Optional Environment Variables
-
-```
-PORT=5000  # Railway sets this automatically
-```
-
-## Deployment Steps
-
-### 1. Connect to Railway
-
-1. Go to [Railway.app](https://railway.app)
-2. Click "New Project"
-3. Select "Deploy from GitHub repo"
-4. Connect your GitHub account
-5. Select your `kasmoni` repository
-
-### 2. Configure Build Settings
-
-In your Railway project settings:
-
-- **Root Directory**: `backend`
-- **Build Command**: `npm install && npm run build`
-- **Start Command**: `npm start`
-
-### 3. Set Environment Variables
-
-In Railway dashboard → Variables tab:
-
-```
-JWT_SECRET=your-super-secret-jwt-key-here
-NODE_ENV=production
-```
-
-### 4. Deploy
-
-Railway will automatically:
-1. Install dependencies
-2. Build the TypeScript code
-3. Start the server
-4. Provide you with a public URL
-
-## Frontend Deployment
-
-### Option A: Deploy Frontend Separately
-
-1. Create a new Railway service for the frontend
-2. Set root directory to `frontend`
-3. Build command: `npm install && npm run build`
-4. Start command: `npm start`
-5. Set environment variable:
-   ```
-   REACT_APP_API_URL=https://your-backend-url.railway.app/api
-   ```
-
-### Option B: Use Vercel/Netlify for Frontend
-
-1. Connect your GitHub repo to Vercel/Netlify
-2. Set build directory to `frontend`
-3. Set environment variable:
-   ```
-   REACT_APP_API_URL=https://your-backend-url.railway.app/api
-   ```
-
-## Database Considerations
-
-### Current Setup (SQLite)
-- SQLite files are stored locally
-- **Not suitable for production** as they're not persistent
-- Data will be lost on container restarts
-
-### Recommended: PostgreSQL
-For production, consider migrating to PostgreSQL:
-
-1. Add PostgreSQL service in Railway
-2. Update database connection
-3. Run migrations
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `JWT_SECRET` | JWT signing secret | Yes |
+| `NODE_ENV` | Environment (production) | Yes |
+| `PORT` | Server port (auto-assigned) | No |
 
 ## Health Check
 
-Your app includes a health check endpoint:
-- URL: `https://your-app.railway.app/api/health`
-- Returns: `{ "success": true, "message": "Sranan Kasmoni API is running" }`
-
-## Monitoring
-
-Railway provides:
-- Logs in real-time
-- Metrics dashboard
-- Automatic restarts on failure
-- Custom domains
+The application includes a health check endpoint:
+- **URL**: `/api/health`
+- **Method**: GET
+- **Response**: JSON with status and timestamp
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. **Build fails**: Check Node.js version compatibility
-2. **Port issues**: Railway sets PORT automatically
-3. **Database errors**: Ensure database directory exists
-4. **CORS errors**: Frontend URL not in allowed origins
+1. **Build Failures**
+   - Check platform logs for TypeScript compilation errors
+   - Verify all dependencies are in `package.json`
 
-### Debug Commands
+2. **Database Issues**
+   - Ensure SQLite database files are not in `.gitignore`
+   - Check file permissions in deployment environment
 
-```bash
-# Check logs
-railway logs
+3. **Port Issues**
+   - Platforms automatically assign `PORT` environment variable
+   - Application listens on `0.0.0.0` for all interfaces
 
-# Check environment variables
-railway variables
+4. **Frontend Not Loading**
+   - Verify React build completed successfully
+   - Check static file serving in Express configuration
 
-# Restart service
-railway service restart
-```
+### Logs
+- View real-time logs in platform dashboard
+- Check both build and runtime logs
+- Monitor application startup messages
 
-## Security Notes
+## Custom Domain (Optional)
 
-1. **JWT_SECRET**: Use a strong, unique secret
-2. **CORS**: Configure for your frontend domain
-3. **Database**: Consider PostgreSQL for production
-4. **HTTPS**: Railway provides this automatically
+1. In platform dashboard, go to "Settings" or "Domains"
+2. Add custom domain
+3. Configure DNS records as instructed
+4. SSL certificate is automatically provisioned
 
-## Cost Optimization
+## Monitoring
 
-- Railway has a free tier
-- Monitor usage in dashboard
-- Consider auto-scaling settings
+Platforms provide:
+- Real-time logs
+- Resource usage metrics
+- Automatic restarts on failure
+- Health check monitoring
+
+## Cost Comparison
+
+| Platform | Free Tier | Paid Plans | Notes |
+|----------|-----------|------------|-------|
+| **Vercel** | 100GB bandwidth/month | $20/month | Recommended |
+| **Render** | 750 hours/month | $7/month | Good alternative |
+| **Railway** | Database only | $5/month | Limited free tier |
+| **Netlify** | 100GB bandwidth/month | $19/month | Frontend focused |
+
+## Security
+
+- Environment variables are encrypted
+- HTTPS enabled by default
+- JWT secrets should be strong and unique
+- Consider rate limiting for production
 
 ## Support
 
-- Railway Documentation: [docs.railway.app](https://docs.railway.app)
-- Community: [Railway Discord](https://discord.gg/railway) 
+For deployment issues:
+1. Check platform documentation
+2. Review application logs
+3. Verify environment variables
+4. Test locally before deploying
+
+## Recommendation
+
+**Use Vercel** for the best free tier experience:
+- Generous limits
+- Excellent developer experience
+- Perfect for full-stack applications
+- Great documentation and support 
