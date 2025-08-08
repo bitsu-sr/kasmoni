@@ -3,20 +3,15 @@
   "buildCommand": "npm run vercel-build",
   "outputDirectory": "frontend/build",
   "installCommand": "npm install",
-  "builds": [
-    {
-      "src": "backend/src/index.ts",
-      "use": "@vercel/node"
+  "functions": {
+    "backend/src/index.ts": {
+      "maxDuration": 30
     }
-  ],
-  "routes": [
+  },
+  "rewrites": [
     {
-      "src": "/api/(.*)",
-      "dest": "backend/src/index.ts"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/api/(.*)",
+      "destination": "/backend/src/index.ts"
     }
   ]
 }
