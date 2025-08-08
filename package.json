@@ -7,7 +7,8 @@
     "install-deps": "cd backend && npm install && cd ../frontend && npm install",
     "build": "cd backend && npm run build && cd ../frontend && npm run build",
     "start": "cd backend && npm start",
-    "dev": "concurrently \"cd backend && npm run dev\" \"cd frontend && npm start\""
+    "dev": "concurrently \"cd backend && npm run dev\" \"cd frontend && npm start\"",
+    "vercel-build": "node vercel-build.js"
   },
   "dependencies": {
     "axios": "^1.11.0"
