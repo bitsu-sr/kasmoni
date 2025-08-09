@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// Use environment variable for API URL in production, fallback to localhost for development
-const API_BASE_URL = process.env.REACT_APP_API_URL || `${window.location.protocol}//${window.location.hostname}:5000/api`;
+// Use environment variable for API URL in production, fallback to same domain for Vercel
+const API_BASE_URL = process.env.REACT_APP_API_URL || `${window.location.protocol}//${window.location.hostname}/api`;
 
 const api = axios.create({
   baseURL: API_BASE_URL,
