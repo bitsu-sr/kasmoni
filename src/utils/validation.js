@@ -57,4 +57,27 @@ export const calculateLateFee = (dueDate, paymentDate) => {
   return diffDays > 0 ? diffDays * 100 : 0; // SRD 100 per day
 };
 
+export const getDisplayName = (firstName, lastName) => {
+  if (!firstName && !lastName) return 'Unknown';
+  if (!firstName) return lastName;
+  if (!lastName) return firstName;
+  return `${firstName} ${lastName}`;
+};
+
+export const formatPhoneNumber = (phoneNumber) => {
+  if (!phoneNumber) return '';
+  // Remove all non-digit characters
+  const cleaned = phoneNumber.replace(/\D/g, '');
+  // Format as (XXX) XXX-XXXX for US numbers
+  if (cleaned.length === 10) {
+    return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
+  }
+  // Return cleaned number if it doesn't match expected format
+  return cleaned;
+};
+
+export const isValidEmail = (email) => {
+  return validateEmail(email);
+};
+
 

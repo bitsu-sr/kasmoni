@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext.js';
 import { paymentsApi, groupsApi, banksApi } from '../services/api.js';
-import { formatCurrency, formatDate, formatMonthYear, getDisplayName } from '../utils/validation.js';
+import { formatCurrency, formatDate, getDisplayName } from '../utils/validation.js';
+import { formatMonthYear } from '../utils/dateUtils.js';
 import Pagination from '../components/Pagination.js';
 
 const Payments = () => {

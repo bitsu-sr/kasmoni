@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.js';
 import { dashboardApi, notificationsApi } from '../services/api.js';
-import { formatCurrency, formatDate, formatMonthYear, getCurrentMonthYear } from '../utils/validation.js';
+import { formatCurrency, formatDate } from '../utils/validation.js';
+import { formatMonthYear } from '../utils/dateUtils.js';
 
 // Live Clock Component
 const LiveClock = () => {

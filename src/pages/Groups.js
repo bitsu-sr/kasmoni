@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext.js';
 import { groupsApi } from '../services/api.js';
-import { formatCurrency, formatDate, formatMonthYear } from '../utils/validation.js';
+import { formatCurrency, formatDate } from '../utils/validation.js';
+import { formatMonthYear } from '../utils/dateUtils.js';
 import Pagination from '../components/Pagination.js';
 
 const Groups = () => {
