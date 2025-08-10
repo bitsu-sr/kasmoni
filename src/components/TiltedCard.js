@@ -2,22 +2,6 @@ import { useRef, useState } from "react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 import "./TiltedCard.css";
 
-interface TiltedCardProps {
-  imageSrc: string;
-  altText?: string;
-  captionText?: string;
-  containerHeight?: string;
-  containerWidth?: string;
-  imageHeight?: string;
-  imageWidth?: string;
-  scaleOnHover?: number;
-  rotateAmplitude?: number;
-  showMobileWarning?: boolean;
-  showTooltip?: boolean;
-  overlayContent?: React.ReactNode;
-  displayOverlayContent?: boolean;
-}
-
 const springValues = {
   damping: 30,
   stiffness: 100,
@@ -38,8 +22,8 @@ export default function TiltedCard({
   showTooltip = true,
   overlayContent = null,
   displayOverlayContent = false,
-}: TiltedCardProps) {
-  const ref = useRef<HTMLElement>(null);
+}) {
+  const ref = useRef(null);
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -55,7 +39,7 @@ export default function TiltedCard({
 
   const [lastY, setLastY] = useState(0);
 
-  function handleMouse(e: React.MouseEvent<HTMLElement>) {
+  function handleMouse(e) {
     if (!ref.current) return;
 
     const rect = ref.current.getBoundingClientRect();
@@ -151,4 +135,4 @@ export default function TiltedCard({
       )}
     </figure>
   );
-} 
+}

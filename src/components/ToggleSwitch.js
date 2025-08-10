@@ -1,14 +1,6 @@
 import React from 'react';
 
-interface ToggleSwitchProps {
-  label: string;
-  checked: boolean;
-  onChange: (checked: boolean) => void;
-  disabled?: boolean;
-  className?: string;
-}
-
-const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
+const ToggleSwitch = ({
   label,
   checked,
   onChange,
@@ -38,4 +30,4 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
   );
 };
 
-export default ToggleSwitch; 
+export default ToggleSwitch;

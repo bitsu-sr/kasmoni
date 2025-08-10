@@ -1,33 +1,9 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Member } from '../types';
 
-interface CsvImportModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onImport: (members: Omit<Member, 'id' | 'createdAt' | 'updatedAt'>[]) => Promise<void>;
-}
-
-interface CsvRow {
-  firstname: string;
-  lastname: string;
-  birthdate: string;
-  birthplace: string;
-  address: string;
-  city: string;
-  phonenumber: string;
-  email: string;
-  nationalid: string;
-  nationality: string;
-  occupation: string;
-  bankname: string;
-  accountnumber: string;
-  registrationdate: string;
-}
-
-const CsvImportModal: React.FC<CsvImportModalProps> = ({ isOpen, onClose, onImport }) => {
+const CsvImportModal = ({ isOpen, onClose, onImport }) => {
   const [isDragOver, setIsDragOver] = useState(false);
-  const [csvData, setCsvData] = useState<CsvRow[]>([]);
-  const [errors, setErrors] = useState<string[]>([]);
+  const [csvData, setCsvData] = useState([]);
+  const [errors, setErrors] = useState([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [fileName, setFileName] = useState('');
 
@@ -46,13 +22,13 @@ const CsvImportModal: React.FC<CsvImportModalProps> = ({ isOpen, onClose, onImpo
     }
   }, [isOpen]);
 
-  const validateEmail = useCallback((email: string): boolean => {
+  const validateEmail = useCallback((email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   }, []);
 
-  const validateRow = useCallback((row: any, index: number): string[] => {
-    const rowErrors: string[] = [];
+  const validateRow = useCallback((row, index) => {
+    const rowErrors = [];
     
     if (!row.firstname?.trim()) rowErrors.push(`Row ${index + 1}: First name is required`);
     if (!row.lastname?.trim()) rowErrors.push(`Row ${index + 1}: Last name is required`);
@@ -75,20 +51,20 @@ const CsvImportModal: React.FC<CsvImportModalProps> = ({ isOpen, onClose, onImpo
     return rowErrors;
   }, [validateEmail]);
 
-  const parseCSV = useCallback((csvText: string): CsvRow[] => {
+  const parseCSV = useCallback((csvText) => {
     // Normalize line endings and split
     const lines = csvText.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n').filter(line => line.trim());
     if (lines.length < 2) return [];
 
     const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
-    const data: CsvRow[] = [];
+    const data = [];
 
     for (let i = 1; i < lines.length; i++) {
       const line = lines[i].trim();
       if (!line) continue; // Skip empty lines
       
       const values = line.split(',').map(v => v.trim().replace(/^"|"$/g, ''));
-      const row: any = {};
+      const row = {};
       
       headers.forEach((header, index) => {
         row[header] = values[index] || '';
@@ -96,14 +72,14 @@ const CsvImportModal: React.FC<CsvImportModalProps> = ({ isOpen, onClose, onImpo
 
       // Only add rows that have at least some data
       if (Object.values(row).some(value => value && typeof value === 'string' && value.trim())) {
-        data.push(row as CsvRow);
+        data.push(row);
       }
     }
 
     return data;
   }, []);
 
-  const handleFileUpload = useCallback((file: File) => {
+  const handleFileUpload = useCallback((file) => {
     if (!file.name.toLowerCase().endsWith('.csv')) {
       setErrors(['Please select a valid CSV file']);
       return;
@@ -113,7 +89,7 @@ const CsvImportModal: React.FC<CsvImportModalProps> = ({ isOpen, onClose, onImpo
     const reader = new FileReader();
     
     reader.onload = (e) => {
-      const text = e.target?.result as string;
+      const text = e.target?.result;
       
       // Check if the CSV has the expected headers
       const lines = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n').filter(line => line.trim());
@@ -142,7 +118,7 @@ const CsvImportModal: React.FC<CsvImportModalProps> = ({ isOpen, onClose, onImpo
         return;
       }
 
-      const validationErrors: string[] = [];
+      const validationErrors = [];
       parsedData.forEach((row, index) => {
         validationErrors.push(...validateRow(row, index));
       });
@@ -154,17 +130,17 @@ const CsvImportModal: React.FC<CsvImportModalProps> = ({ isOpen, onClose, onImpo
     reader.readAsText(file);
   }, [validateRow, parseCSV]);
 
-  const handleDragOver = useCallback((e: React.DragEvent) => {
+  const handleDragOver = useCallback((e) => {
     e.preventDefault();
     setIsDragOver(true);
   }, []);
 
-  const handleDragLeave = useCallback((e: React.DragEvent) => {
+  const handleDragLeave = useCallback((e) => {
     e.preventDefault();
     setIsDragOver(false);
   }, []);
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
+  const handleDrop = useCallback((e) => {
     e.preventDefault();
     setIsDragOver(false);
     
@@ -174,7 +150,7 @@ const CsvImportModal: React.FC<CsvImportModalProps> = ({ isOpen, onClose, onImpo
     }
   }, [handleFileUpload]);
 
-  const handleFileInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileInput = useCallback((e) => {
     const file = e.target.files?.[0];
     if (file) {
       handleFileUpload(file);
@@ -186,7 +162,7 @@ const CsvImportModal: React.FC<CsvImportModalProps> = ({ isOpen, onClose, onImpo
     onClose();
   };
 
-  const convertCsvToApiFormat = (csvData: CsvRow[]): Omit<Member, 'id' | 'createdAt' | 'updatedAt'>[] => {
+  const convertCsvToApiFormat = (csvData) => {
     return csvData.map(row => ({
       firstName: row.firstname,
       lastName: row.lastname,
@@ -211,17 +187,17 @@ const CsvImportModal: React.FC<CsvImportModalProps> = ({ isOpen, onClose, onImpo
     }
 
     setIsProcessing(true);
-         try {
-       const apiData = convertCsvToApiFormat(csvData);
-       await onImport(apiData);
-       clearModalState();
-       onClose();
-     } catch (error: any) {
-       // Error is already handled by the parent component
-       // Just close the modal to show the results
-       clearModalState();
-       onClose();
-     } finally {
+    try {
+      const apiData = convertCsvToApiFormat(csvData);
+      await onImport(apiData);
+      clearModalState();
+      onClose();
+    } catch (error) {
+      // Error is already handled by the parent component
+      // Just close the modal to show the results
+      clearModalState();
+      onClose();
+    } finally {
       setIsProcessing(false);
     }
   };
@@ -247,13 +223,13 @@ const CsvImportModal: React.FC<CsvImportModalProps> = ({ isOpen, onClose, onImpo
 
   if (!isOpen) return null;
 
-     return (
-     <div className="modal-overlay" onClick={handleClose}>
-       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                 <div className="modal-header">
-           <h2>Import Members from CSV</h2>
-           <button className="modal-close" onClick={handleClose}>&times;</button>
-         </div>
+  return (
+    <div className="modal-overlay" onClick={handleClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <h2>Import Members from CSV</h2>
+          <button className="modal-close" onClick={handleClose}>&times;</button>
+        </div>
 
         <div className="modal-body">
           <div className="import-section">
@@ -316,14 +292,14 @@ const CsvImportModal: React.FC<CsvImportModalProps> = ({ isOpen, onClose, onImpo
                       </tr>
                     </thead>
                     <tbody>
-                                             {csvData.slice(0, 5).map((row, index) => (
-                         <tr key={index}>
-                           <td>{row.firstname} {row.lastname}</td>
-                           <td>{row.email}</td>
-                           <td>{row.phonenumber}</td>
-                           <td>{row.nationalid}</td>
-                         </tr>
-                       ))}
+                      {csvData.slice(0, 5).map((row, index) => (
+                        <tr key={index}>
+                          <td>{row.firstname} {row.lastname}</td>
+                          <td>{row.email}</td>
+                          <td>{row.phonenumber}</td>
+                          <td>{row.nationalid}</td>
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
                   {csvData.length > 5 && (
@@ -335,14 +311,14 @@ const CsvImportModal: React.FC<CsvImportModalProps> = ({ isOpen, onClose, onImpo
           </div>
         </div>
 
-                 <div className="modal-footer">
-           <button 
-             className="btn btn-secondary" 
-             onClick={handleClose}
-             disabled={isProcessing}
-           >
-             Cancel
-           </button>
+        <div className="modal-footer">
+          <button 
+            className="btn btn-secondary" 
+            onClick={handleClose}
+            disabled={isProcessing}
+          >
+            Cancel
+          </button>
           <button 
             className="btn btn-primary" 
             onClick={handleImport}
@@ -356,4 +332,4 @@ const CsvImportModal: React.FC<CsvImportModalProps> = ({ isOpen, onClose, onImpo
   );
 };
 
-export default CsvImportModal; 
+export default CsvImportModal;

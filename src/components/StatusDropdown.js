@@ -1,14 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown } from 'lucide-react';
 
-interface StatusDropdownProps {
-  currentStatus: string;
-  paymentId: number;
-  onStatusChange: (paymentId: number, newStatus: string) => Promise<void>;
-  disabled?: boolean;
-}
-
-const StatusDropdown: React.FC<StatusDropdownProps> = ({ 
+const StatusDropdown = ({ 
   currentStatus, 
   paymentId, 
   onStatusChange, 
@@ -16,7 +9,7 @@ const StatusDropdown: React.FC<StatusDropdownProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef(null);
 
   const statusOptions = [
     { value: 'not_paid', label: 'Not Paid', class: 'badge-secondary' },
@@ -25,12 +18,12 @@ const StatusDropdown: React.FC<StatusDropdownProps> = ({
     { value: 'settled', label: 'Settled', class: 'badge-success' }
   ];
 
-  const getStatusClass = (status: string) => {
+  const getStatusClass = (status) => {
     const option = statusOptions.find(opt => opt.value === status);
     return option?.class || 'badge-secondary';
   };
 
-  const getStatusBackgroundColor = (status: string) => {
+  const getStatusBackgroundColor = (status) => {
     switch (status) {
       case 'not_paid':
         return '#6c757d'; // Gray
@@ -45,14 +38,14 @@ const StatusDropdown: React.FC<StatusDropdownProps> = ({
     }
   };
 
-  const getStatusLabel = (status: string) => {
+  const getStatusLabel = (status) => {
     const option = statusOptions.find(opt => opt.value === status);
     return option?.label || status.replace('_', ' ').toUpperCase();
   };
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
       }
     };
@@ -63,7 +56,7 @@ const StatusDropdown: React.FC<StatusDropdownProps> = ({
     };
   }, []);
 
-  const handleStatusChange = async (newStatus: string) => {
+  const handleStatusChange = async (newStatus) => {
     if (newStatus === currentStatus || disabled) return;
     
     // Add confirmation for important status changes
@@ -122,4 +115,4 @@ const StatusDropdown: React.FC<StatusDropdownProps> = ({
   );
 };
 
-export default StatusDropdown; 
+export default StatusDropdown;

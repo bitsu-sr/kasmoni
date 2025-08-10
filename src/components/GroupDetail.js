@@ -1,22 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { groupsApi, paymentsApi } from '../services/api';
-import { Group, GroupMember, Payment, GroupStatus } from '../types';
 import { formatPaymentDate } from '../utils/dateUtils';
 import AddMemberModal from './AddMemberModal';
 
-interface GroupDetailProps {
-  group: Group;
-  onClose: () => void;
-  onUpdate: (group: Group) => void;
-  onDelete: (id: number) => void;
-}
-
-const GroupDetail: React.FC<GroupDetailProps> = ({ group, onClose, onUpdate, onDelete }) => {
+const GroupDetail = ({ group, onClose, onUpdate, onDelete }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [groupMembers, setGroupMembers] = useState<GroupMember[]>([]);
-  const [payments, setPayments] = useState<Payment[]>([]);
+  const [error, setError] = useState(null);
+  const [groupMembers, setGroupMembers] = useState([]);
+  const [payments, setPayments] = useState([]);
   const [showAddMemberModal, setShowAddMemberModal] = useState(false);
   const [formData, setFormData] = useState({
     name: group.name,
@@ -28,7 +20,7 @@ const GroupDetail: React.FC<GroupDetailProps> = ({ group, onClose, onUpdate, onD
     startMonthValue: (new Date(group.startMonth).getMonth() + 1).toString().padStart(2, '0'),
   });
 
-  const getCurrentMonth = (): string => {
+  const getCurrentMonth = () => {
     const now = new Date();
     const year = now.getFullYear();
     const month = (now.getMonth() + 1).toString().padStart(2, '0');
@@ -62,7 +54,7 @@ const GroupDetail: React.FC<GroupDetailProps> = ({ group, onClose, onUpdate, onD
     fetchPayments();
   }, [fetchGroupMembers, fetchPayments]);
 
-  const calculateEndMonth = (startMonth: string, duration: number): string => {
+  const calculateEndMonth = (startMonth, duration) => {
     if (!startMonth || !duration) return '';
     
     const [year, month] = startMonth.split('-').map(Number);
@@ -73,18 +65,18 @@ const GroupDetail: React.FC<GroupDetailProps> = ({ group, onClose, onUpdate, onD
     return `${endYear}-${finalMonth.toString().padStart(2, '0')}`;
   };
 
-  const formatMonthYear = (monthYear: string): string => {
+  const formatMonthYear = (monthYear) => {
     if (!monthYear) return '';
     const [year, month] = monthYear.split('-').map(Number);
     const date = new Date(year, month - 1); // month is 0-indexed in Date constructor
     return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
   };
 
-  const getPendingCount = (): number => {
+  const getPendingCount = () => {
     return payments.filter(payment => payment.status === 'pending' || payment.status === 'not_paid').length;
   };
 
-  const getStatusDisplay = (status: GroupStatus | undefined, pendingCount?: number) => {
+  const getStatusDisplay = (status, pendingCount) => {
     // Always prioritize backend status first
     switch (status) {
       case 'fully_paid':
@@ -102,7 +94,7 @@ const GroupDetail: React.FC<GroupDetailProps> = ({ group, onClose, onUpdate, onD
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => {
       const updated = { ...prev, [name]: value };
@@ -167,7 +159,7 @@ const GroupDetail: React.FC<GroupDetailProps> = ({ group, onClose, onUpdate, onD
     setShowAddMemberModal(false);
   };
 
-  const handleRemoveMember = async (memberId: number) => {
+  const handleRemoveMember = async (memberId) => {
     if (window.confirm('Are you sure you want to remove this member from the group?')) {
       try {
         const response = await groupsApi.removeMember(group.id, memberId);
@@ -182,8 +174,8 @@ const GroupDetail: React.FC<GroupDetailProps> = ({ group, onClose, onUpdate, onD
     }
   };
 
-  const getAvailableMonths = (): string[] => {
-    const months: string[] = [];
+  const getAvailableMonths = () => {
+    const months = [];
     const [startYear, startMonth] = group.startMonth.split('-').map(Number);
     const [endYear, endMonth] = group.endMonth.split('-').map(Number);
     
@@ -206,7 +198,7 @@ const GroupDetail: React.FC<GroupDetailProps> = ({ group, onClose, onUpdate, onD
     return months.filter(month => !takenMonths.includes(month));
   };
 
-  const getPaymentStatus = (memberId: number, receiveMonth: string): string => {
+  const getPaymentStatus = (memberId, receiveMonth) => {
     const currentMonth = getCurrentMonth();
     
     // For each member in group details
@@ -226,7 +218,7 @@ const GroupDetail: React.FC<GroupDetailProps> = ({ group, onClose, onUpdate, onD
     return 'Not Paid';
   };
 
-  const getStatusColor = (status: string): string => {
+  const getStatusColor = (status) => {
     switch (status.toLowerCase()) {
       case 'received':
         return 'status-received';
@@ -308,58 +300,58 @@ const GroupDetail: React.FC<GroupDetailProps> = ({ group, onClose, onUpdate, onD
                 </div>
               </div>
 
-                             <div className="form-row">
-                 <div className="form-group">
-                   <label className="form-label">Start Month *</label>
-                   <div className="month-year-selector">
-                     <select 
-                       name="startMonthValue" 
-                       value={formData.startMonthValue} 
-                       onChange={handleInputChange} 
-                       className="form-control" 
-                       required 
-                     >
-                       <option value="01">January</option>
-                       <option value="02">February</option>
-                       <option value="03">March</option>
-                       <option value="04">April</option>
-                       <option value="05">May</option>
-                       <option value="06">June</option>
-                       <option value="07">July</option>
-                       <option value="08">August</option>
-                       <option value="09">September</option>
-                       <option value="10">October</option>
-                       <option value="11">November</option>
-                       <option value="12">December</option>
-                     </select>
-                                           <select 
-                        name="startYear" 
-                        value={formData.startYear} 
-                        onChange={handleInputChange} 
-                        className="form-control" 
-                        required 
-                      >
-                        {Array.from({ length: 10 }, (_, i) => {
-                          const year = 2021 + i;
-                          return (
-                            <option key={year} value={year.toString()}>
-                              {year}
-                            </option>
-                          );
-                        })}
-                      </select>
-                   </div>
-                 </div>
-                 <div className="form-group">
-                   <label className="form-label">End Month (Calculated)</label>
-                   <input 
-                     type="month" 
-                     value={calculateEndMonth(formData.startMonth, parseInt(formData.duration))} 
-                     className="form-control" 
-                     disabled 
-                   />
-                 </div>
-               </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Start Month *</label>
+                  <div className="month-year-selector">
+                    <select 
+                      name="startMonthValue" 
+                      value={formData.startMonthValue} 
+                      onChange={handleInputChange} 
+                      className="form-control" 
+                      required 
+                    >
+                      <option value="01">January</option>
+                      <option value="02">February</option>
+                      <option value="03">March</option>
+                      <option value="04">April</option>
+                      <option value="05">May</option>
+                      <option value="06">June</option>
+                      <option value="07">July</option>
+                      <option value="08">August</option>
+                      <option value="09">September</option>
+                      <option value="10">October</option>
+                      <option value="11">November</option>
+                      <option value="12">December</option>
+                    </select>
+                    <select 
+                      name="startYear" 
+                      value={formData.startYear} 
+                      onChange={handleInputChange} 
+                      className="form-control" 
+                      required 
+                    >
+                      {Array.from({ length: 10 }, (_, i) => {
+                        const year = 2021 + i;
+                        return (
+                          <option key={year} value={year.toString()}>
+                            {year}
+                          </option>
+                        );
+                      })}
+                    </select>
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">End Month (Calculated)</label>
+                  <input 
+                    type="month" 
+                    value={calculateEndMonth(formData.startMonth, parseInt(formData.duration))} 
+                    className="form-control" 
+                    disabled 
+                  />
+                </div>
+              </div>
 
               <div className="form-actions">
                 <button 
@@ -394,9 +386,9 @@ const GroupDetail: React.FC<GroupDetailProps> = ({ group, onClose, onUpdate, onD
               <div className="detail-row">
                 <div className="detail-group">
                   <label>Group Status:</label>
-                          <span className={`badge ${getStatusDisplay(group.status, group.pendingCount).class}`}>
-          {getStatusDisplay(group.status, group.pendingCount).text}
-        </span>
+                  <span className={`badge ${getStatusDisplay(group.status, group.pendingCount).class}`}>
+                    {getStatusDisplay(group.status, group.pendingCount).text}
+                  </span>
                 </div>
                 <div className="detail-group">
                   <label>Created:</label>
@@ -416,14 +408,14 @@ const GroupDetail: React.FC<GroupDetailProps> = ({ group, onClose, onUpdate, onD
               </div>
 
               <div className="detail-row">
-                                 <div className="detail-group">
-                   <label>Start Month:</label>
-                   <span>{formatMonthYear(group.startMonth)}</span>
-                 </div>
-                 <div className="detail-group">
-                   <label>End Month:</label>
-                   <span>{formatMonthYear(group.endMonth)}</span>
-                 </div>
+                <div className="detail-group">
+                  <label>Start Month:</label>
+                  <span>{formatMonthYear(group.startMonth)}</span>
+                </div>
+                <div className="detail-group">
+                  <label>End Month:</label>
+                  <span>{formatMonthYear(group.endMonth)}</span>
+                </div>
               </div>
 
               <div className="detail-row">
@@ -486,40 +478,40 @@ const GroupDetail: React.FC<GroupDetailProps> = ({ group, onClose, onUpdate, onD
               </div>
             ) : (
               <div className="table-container">
-                                 <table className="group-members-table">
-                   <thead>
-                     <tr>
-                       <th>Member Name</th>
-                       <th>Receive Month</th>
-                       <th>Status</th>
-                       <th>Actions</th>
-                     </tr>
-                   </thead>
-                   <tbody>
-                     {groupMembers.map((groupMember) => {
-                       const status = getPaymentStatus(groupMember.memberId, groupMember.receiveMonth);
-                       return (
-                         <tr key={groupMember.id}>
-                           <td>{groupMember.firstName || groupMember.member?.firstName} {groupMember.lastName || groupMember.member?.lastName}</td>
-                           <td>{formatMonthYear(groupMember.receiveMonth)}</td>
-                           <td>
-                             <span className={`status-badge ${getStatusColor(status)}`}>
-                               {status}
-                             </span>
-                           </td>
-                           <td>
-                             <button 
-                               className="btn btn-sm btn-danger"
-                               onClick={() => handleRemoveMember(groupMember.memberId)}
-                             >
-                               Remove
-                             </button>
-                           </td>
-                         </tr>
-                       );
-                     })}
-                   </tbody>
-                 </table>
+                <table className="group-members-table">
+                  <thead>
+                    <tr>
+                      <th>Member Name</th>
+                      <th>Receive Month</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {groupMembers.map((groupMember) => {
+                      const status = getPaymentStatus(groupMember.memberId, groupMember.receiveMonth);
+                      return (
+                        <tr key={groupMember.id}>
+                          <td>{groupMember.firstName || groupMember.member?.firstName} {groupMember.lastName || groupMember.member?.lastName}</td>
+                          <td>{formatMonthYear(groupMember.receiveMonth)}</td>
+                          <td>
+                            <span className={`status-badge ${getStatusColor(status)}`}>
+                              {status}
+                            </span>
+                          </td>
+                          <td>
+                            <button 
+                              className="btn btn-sm btn-danger"
+                              onClick={() => handleRemoveMember(groupMember.memberId)}
+                            >
+                              Remove
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
             )}
           </div>
@@ -538,4 +530,4 @@ const GroupDetail: React.FC<GroupDetailProps> = ({ group, onClose, onUpdate, onD
   );
 };
 
-export default GroupDetail; 
+export default GroupDetail;

@@ -1,39 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { X, Save, AlertCircle, CheckCircle } from 'lucide-react';
 import { groupsApi, paymentsApi, banksApi } from '../services/api';
-import { Group, Bank, Payment, GroupMemberSlot } from '../types';
 import { getCurrentDateString, getCurrentMonthString } from '../utils/dateUtils';
 
-interface BulkPaymentData {
-  memberId: number;
-  firstName: string;
-  lastName: string;
-  slot: string;
-  slotLabel: string;
-  amount: string;
-  paymentDate: string;
-  paymentType: 'cash' | 'bank_transfer';
-  senderBank: string;
-  receiverBank: string;
-  status: 'not_paid' | 'pending' | 'received' | 'settled';
-}
-
-interface BulkPaymentModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSuccess: (payments: Payment[]) => void;
-}
-
-const BulkPaymentModal: React.FC<BulkPaymentModalProps> = ({ isOpen, onClose, onSuccess }) => {
-  const [groups, setGroups] = useState<Group[]>([]);
-  const [banks, setBanks] = useState<Bank[]>([]);
-  const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
+const BulkPaymentModal = ({ isOpen, onClose, onSuccess }) => {
+  const [groups, setGroups] = useState([]);
+  const [banks, setBanks] = useState([]);
+  const [selectedGroup, setSelectedGroup] = useState(null);
   const [paymentMonth, setPaymentMonth] = useState(getCurrentMonthString());
-  const [memberSlots, setMemberSlots] = useState<GroupMemberSlot[]>([]);
-  const [paymentData, setPaymentData] = useState<{[key: string]: BulkPaymentData}>({});
+  const [memberSlots, setMemberSlots] = useState([]);
+  const [paymentData, setPaymentData] = useState({});
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [validationErrors, setValidationErrors] = useState<{[key: string]: string[]}>({});
+  const [error, setError] = useState(null);
+  const [validationErrors, setValidationErrors] = useState({});
 
   // Generate month options for the dropdown
   const generateMonthOptions = () => {
@@ -96,7 +75,7 @@ const BulkPaymentModal: React.FC<BulkPaymentModalProps> = ({ isOpen, onClose, on
     }
   };
 
-  const fetchGroupMembers = async (groupId: number) => {
+  const fetchGroupMembers = async (groupId) => {
     try {
       setLoading(true);
       const response = await paymentsApi.getGroupMembersSlots(groupId);
@@ -105,7 +84,7 @@ const BulkPaymentModal: React.FC<BulkPaymentModalProps> = ({ isOpen, onClose, on
         setMemberSlots(slots);
         
         // Initialize payment data for each slot
-        const initialData: {[key: string]: BulkPaymentData} = {};
+        const initialData = {};
         slots.forEach(slot => {
           if (slot.hasPaid && slot.payment) {
             // Pre-fill with existing payment data for slots with payments
@@ -148,7 +127,7 @@ const BulkPaymentModal: React.FC<BulkPaymentModalProps> = ({ isOpen, onClose, on
     }
   };
 
-  const handleGroupChange = (groupId: string) => {
+  const handleGroupChange = (groupId) => {
     const group = groups.find(g => g.id.toString() === groupId);
     setSelectedGroup(group || null);
     setMemberSlots([]);
@@ -170,7 +149,7 @@ const BulkPaymentModal: React.FC<BulkPaymentModalProps> = ({ isOpen, onClose, on
     onClose();
   };
 
-  const handlePaymentDataChange = (slotKey: string, field: keyof BulkPaymentData, value: string) => {
+  const handlePaymentDataChange = (slotKey, field, value) => {
     setPaymentData(prev => ({
       ...prev,
       [slotKey]: {
@@ -188,7 +167,7 @@ const BulkPaymentModal: React.FC<BulkPaymentModalProps> = ({ isOpen, onClose, on
     }
   };
 
-  const handleTogglePaymentType = (slotKey: string) => {
+  const handleTogglePaymentType = (slotKey) => {
     const currentType = paymentData[slotKey]?.paymentType || 'bank_transfer';
     const newType = currentType === 'cash' ? 'bank_transfer' : 'cash';
     
@@ -238,8 +217,8 @@ const BulkPaymentModal: React.FC<BulkPaymentModalProps> = ({ isOpen, onClose, on
         setValidationErrors({});
         return true;
       } else {
-        const errors: {[key: string]: string[]} = {};
-        response.data.data.forEach((result: any) => {
+        const errors = {};
+        response.data.data.forEach((result) => {
           if (result.errors.length > 0) {
             // Find the slot key based on memberId and slot
             const slotKey = Object.keys(paymentData).find(key => 
@@ -259,7 +238,7 @@ const BulkPaymentModal: React.FC<BulkPaymentModalProps> = ({ isOpen, onClose, on
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
 
@@ -306,8 +285,6 @@ const BulkPaymentModal: React.FC<BulkPaymentModalProps> = ({ isOpen, onClose, on
         }))
       };
       
-
-      
       const response = await paymentsApi.createBulk(requestData);
 
       if (response.data.success && response.data.data) {
@@ -316,14 +293,14 @@ const BulkPaymentModal: React.FC<BulkPaymentModalProps> = ({ isOpen, onClose, on
       } else {
         setError(response.data.error || 'Failed to create payments');
       }
-    } catch (err: any) {
+    } catch (err) {
       setError(err.response?.data?.error || 'Failed to create payments');
     } finally {
       setLoading(false);
     }
   };
 
-  const getFieldError = (slotKey: string, field: string) => {
+  const getFieldError = (slotKey, field) => {
     const errors = validationErrors[slotKey] || [];
     return errors.find(error => error.toLowerCase().includes(field.toLowerCase()));
   };
@@ -401,7 +378,7 @@ const BulkPaymentModal: React.FC<BulkPaymentModalProps> = ({ isOpen, onClose, on
                       </tr>
                     </thead>
                     <tbody>
-                                                                   {memberSlots.map((slot) => {
+                      {memberSlots.map((slot) => {
                         const payment = paymentData[slot.slot];
                         const slotErrors = validationErrors[slot.slot] || [];
                         const isCompleted = slot.hasPaid && payment?.status && ['received', 'settled'].includes(payment.status);
@@ -571,4 +548,4 @@ const BulkPaymentModal: React.FC<BulkPaymentModalProps> = ({ isOpen, onClose, on
   );
 };
 
-export default BulkPaymentModal; 
+export default BulkPaymentModal;

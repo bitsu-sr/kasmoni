@@ -7,7 +7,7 @@
  * This prevents the date from shifting when the original date was stored in UTC
  * but we want to display it as the local date it was intended to represent
  */
-export const formatPaymentDate = (dateString: string): string => {
+export const formatPaymentDate = (dateString) => {
   if (!dateString) return '';
   
   // Parse the date string and create a date object
@@ -31,7 +31,7 @@ export const formatPaymentDate = (dateString: string): string => {
 /**
  * Formats a date string for display in a more compact format
  */
-export const formatDateShort = (dateString: string): string => {
+export const formatDateShort = (dateString) => {
   if (!dateString) return '';
   
   const date = new Date(dateString);
@@ -51,7 +51,7 @@ export const formatDateShort = (dateString: string): string => {
 /**
  * Formats a month-year string (YYYY-MM) to a readable format
  */
-export const formatMonthYear = (monthYear: string): string => {
+export const formatMonthYear = (monthYear) => {
   if (!monthYear) return '';
   
   const [year, month] = monthYear.split('-').map(Number);
@@ -68,7 +68,7 @@ export const formatMonthYear = (monthYear: string): string => {
  * Gets the current date in YYYY-MM-DD format for form inputs
  * Uses local timezone to avoid timezone issues
  */
-export const getCurrentDateString = (): string => {
+export const getCurrentDateString = () => {
   const now = new Date();
   const year = now.getFullYear();
   const month = (now.getMonth() + 1).toString().padStart(2, '0');
@@ -79,7 +79,7 @@ export const getCurrentDateString = (): string => {
 /**
  * Gets the current month in YYYY-MM format for form inputs
  */
-export const getCurrentMonthString = (): string => {
+export const getCurrentMonthString = () => {
   const now = new Date();
   const year = now.getFullYear();
   const month = (now.getMonth() + 1).toString().padStart(2, '0');
@@ -90,11 +90,7 @@ export const getCurrentMonthString = (): string => {
  * Formats a timestamp string to local timezone for display
  * Handles UTC timestamps and converts them to local time
  */
-export const formatTimestamp = (timestamp: string): {
-  date: string;
-  time: string;
-  full: string;
-} => {
+export const formatTimestamp = (timestamp) => {
   if (!timestamp) return { date: '', time: '', full: '' };
   
   // Parse the UTC timestamp and convert to local time

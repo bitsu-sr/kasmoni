@@ -1,25 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { membersApi, groupsApi } from '../services/api';
-import { Member, Group } from '../types';
 
-interface AddMemberModalProps {
-  group: Group;
-  availableMonths: string[];
-  onClose: () => void;
-  onMemberAdded: () => void;
-}
-
-const AddMemberModal: React.FC<AddMemberModalProps> = ({ 
+const AddMemberModal = ({ 
   group, 
   availableMonths, 
   onClose, 
   onMemberAdded 
 }) => {
-  const [members, setMembers] = useState<Member[]>([]);
+  const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedMemberId, setSelectedMemberId] = useState<number | ''>('');
-  const [selectedMonth, setSelectedMonth] = useState<string>('');
+  const [error, setError] = useState(null);
+  const [selectedMemberId, setSelectedMemberId] = useState('');
+  const [selectedMonth, setSelectedMonth] = useState('');
 
   useEffect(() => {
     fetchMembers();
@@ -50,7 +42,7 @@ const AddMemberModal: React.FC<AddMemberModalProps> = ({
     try {
       setLoading(true);
       const response = await groupsApi.addMember(group.id, {
-        memberId: selectedMemberId as number,
+        memberId: parseInt(selectedMemberId),
         receiveMonth: selectedMonth,
       });
 
@@ -74,7 +66,7 @@ const AddMemberModal: React.FC<AddMemberModalProps> = ({
     'July', 'August', 'September', 'October', 'November', 'December'
   ];
 
-  const formatMonth = (monthString: string): string => {
+  const formatMonth = (monthString) => {
     if (!monthString) return '';
     const [year, month] = monthString.split('-').map(Number);
     return `${MONTH_NAMES[month - 1]} ${year}`;
@@ -95,7 +87,7 @@ const AddMemberModal: React.FC<AddMemberModalProps> = ({
             <label className="form-label">Select Member *</label>
             <select 
               value={selectedMemberId} 
-              onChange={(e) => setSelectedMemberId(e.target.value ? parseInt(e.target.value) : '')}
+              onChange={(e) => setSelectedMemberId(e.target.value)}
               className="form-control"
               required
             >
@@ -162,4 +154,4 @@ const AddMemberModal: React.FC<AddMemberModalProps> = ({
   );
 };
 
-export default AddMemberModal; 
+export default AddMemberModal;

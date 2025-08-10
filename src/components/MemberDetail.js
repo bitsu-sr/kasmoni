@@ -1,21 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { membersApi } from '../services/api';
-import { Member } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 
-interface MemberDetailProps {
-  member: Member;
-  onClose: () => void;
-  onUpdate: (member: Member) => void;
-  onDelete: (id: number) => void;
-}
-
-const MemberDetail: React.FC<MemberDetailProps> = ({ member, onClose, onUpdate, onDelete }) => {
+const MemberDetail = ({ member, onClose, onUpdate, onDelete }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [emailValid, setEmailValid] = useState<boolean | null>(null);
-  const [memberGroups, setMemberGroups] = useState<{ groupName: string; receiveMonth: string; monthlyAmount: number; paymentStatus: string }[]>([]);
+  const [error, setError] = useState(null);
+  const [emailValid, setEmailValid] = useState(null);
+  const [memberGroups, setMemberGroups] = useState([]);
   const [groupsLoading, setGroupsLoading] = useState(false);
   const [currentMember, setCurrentMember] = useState(member);
   const { user, isAuthenticated } = useAuth();
@@ -44,7 +36,7 @@ const MemberDetail: React.FC<MemberDetailProps> = ({ member, onClose, onUpdate, 
   const canDelete = isAdministrator;
 
   // Function to show access denied message
-  const showAccessDenied = (action: string) => {
+  const showAccessDenied = (action) => {
     if (action === 'edit') {
       alert('Access denied! Please contact the Sranan Kasmoni administrator or super user to edit members');
     } else if (action === 'delete') {
@@ -52,12 +44,12 @@ const MemberDetail: React.FC<MemberDetailProps> = ({ member, onClose, onUpdate, 
     }
   };
 
-  const validateEmail = (email: string): boolean => {
+  const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
 
-  const getStatusDisplay = (status: string) => {
+  const getStatusDisplay = (status) => {
     switch (status.toLowerCase()) {
       case 'received':
         return { text: 'Received', class: 'badge-success' };
@@ -72,7 +64,7 @@ const MemberDetail: React.FC<MemberDetailProps> = ({ member, onClose, onUpdate, 
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
 
@@ -133,7 +125,7 @@ const MemberDetail: React.FC<MemberDetailProps> = ({ member, onClose, onUpdate, 
         console.log('Update failed:', response.data.error);
         setError(response.data.error || 'Failed to update member');
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error('Error updating member:', err);
       let errorMessage = 'Error updating member';
       
@@ -212,33 +204,33 @@ const MemberDetail: React.FC<MemberDetailProps> = ({ member, onClose, onUpdate, 
 
         {error && <div className="alert alert-danger">{error}</div>}
 
-                 <div className="modal-body">
-           {/* Member Summary Tiles */}
-           <div className="member-summary-tiles">
-             <div className="summary-tile">
-               <div className="tile-icon">📊</div>
-               <div className="tile-content">
-                 <h4>Total Slots</h4>
-                 <p>{memberGroups.length}</p>
-               </div>
-             </div>
-             <div className="summary-tile">
-               <div className="tile-icon">💰</div>
-               <div className="tile-content">
-                 <h4>Total Monthly Amount</h4>
-                 <p>SRD {memberGroups.reduce((total, group) => total + (group.monthlyAmount || 0), 0).toLocaleString()}</p>
-               </div>
-             </div>
-           </div>
+        <div className="modal-body">
+          {/* Member Summary Tiles */}
+          <div className="member-summary-tiles">
+            <div className="summary-tile">
+              <div className="tile-icon">📊</div>
+              <div className="tile-content">
+                <h4>Total Slots</h4>
+                <p>{memberGroups.length}</p>
+              </div>
+            </div>
+            <div className="summary-tile">
+              <div className="tile-icon">💰</div>
+              <div className="tile-content">
+                <h4>Total Monthly Amount</h4>
+                <p>SRD {memberGroups.reduce((total, group) => total + (group.monthlyAmount || 0), 0).toLocaleString()}</p>
+              </div>
+            </div>
+          </div>
 
-           {/* Member Groups Table */}
-           <div className="member-groups-section">
+          {/* Member Groups Table */}
+          <div className="member-groups-section">
             <h3>Member Groups</h3>
             {groupsLoading ? (
               <div className="loading">Loading groups...</div>
             ) : memberGroups.length > 0 ? (
               <div className="table-container">
-                                                 <table className="member-groups-table">
+                <table className="member-groups-table">
                   <thead>
                     <tr>
                       <th>Group Name</th>
@@ -253,11 +245,11 @@ const MemberDetail: React.FC<MemberDetailProps> = ({ member, onClose, onUpdate, 
                         <td>{group.groupName}</td>
                         <td>{group.receiveMonth}</td>
                         <td>SRD {group.monthlyAmount?.toLocaleString() || '0'}</td>
-                                                 <td>
-                           <span className={`badge ${getStatusDisplay(group.paymentStatus).class}`}>
-                             {getStatusDisplay(group.paymentStatus).text}
-                           </span>
-                         </td>
+                        <td>
+                          <span className={`badge ${getStatusDisplay(group.paymentStatus).class}`}>
+                            {getStatusDisplay(group.paymentStatus).text}
+                          </span>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -588,4 +580,4 @@ const MemberDetail: React.FC<MemberDetailProps> = ({ member, onClose, onUpdate, 
   );
 };
 
-export default MemberDetail; 
+export default MemberDetail;

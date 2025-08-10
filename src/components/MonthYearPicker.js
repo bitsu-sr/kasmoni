@@ -2,15 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { formatMonthYear } from '../utils/dateUtils';
 
-interface MonthYearPickerProps {
-  value: string; // Format: YYYY-MM
-  onChange: (value: string) => void;
-  placeholder?: string;
-  className?: string;
-  disabled?: boolean;
-}
-
-const MonthYearPicker: React.FC<MonthYearPickerProps> = ({
+const MonthYearPicker = ({
   value,
   onChange,
   placeholder = "Select month...",
@@ -33,7 +25,7 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({
     return new Date().getMonth() + 1;
   });
   
-  const pickerRef = useRef<HTMLDivElement>(null);
+  const pickerRef = useRef(null);
 
   const months = [
     { value: 1, label: 'Jan' },
@@ -51,8 +43,8 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({
   ];
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (pickerRef.current && !pickerRef.current.contains(event.target as Node)) {
+    const handleClickOutside = (event) => {
+      if (pickerRef.current && !pickerRef.current.contains(event.target)) {
         setIsOpen(false);
       }
     };
@@ -66,7 +58,7 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({
     };
   }, [isOpen]);
 
-  const handleMonthSelect = (month: number) => {
+  const handleMonthSelect = (month) => {
     setSelectedMonth(month);
     const monthStr = month.toString().padStart(2, '0');
     const yearStr = currentYear.toString();
@@ -75,7 +67,7 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({
     setIsOpen(false);
   };
 
-  const handleYearChange = (direction: 'prev' | 'next') => {
+  const handleYearChange = (direction) => {
     setCurrentYear(prev => direction === 'prev' ? prev - 1 : prev + 1);
   };
 
@@ -86,7 +78,7 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({
     return placeholder;
   };
 
-  const isCurrentMonthSelected = (month: number) => {
+  const isCurrentMonthSelected = (month) => {
     if (!value) return false;
     const [year, monthStr] = value.split('-');
     return parseInt(year) === currentYear && parseInt(monthStr) === month;
@@ -140,4 +132,4 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({
   );
 };
 
-export default MonthYearPicker; 
+export default MonthYearPicker;
