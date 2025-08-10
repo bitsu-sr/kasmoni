@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { getBanks, createBank, updateBank, deleteBank } from '../services/api';
+import { banksApi } from '../services/api';
 import '../styles/Banks.css';
 
 const Banks = () => {
@@ -28,8 +28,12 @@ const Banks = () => {
   const fetchBanks = async () => {
     try {
       setLoading(true);
-      const data = await getBanks();
-      setBanks(data);
+      const response = await banksApi.getAll();
+      if (response.data && response.data.success) {
+        setBanks(response.data.data);
+      } else {
+        setBanks([]);
+      }
       setError(null);
     } catch (err) {
       setError('Failed to fetch banks');
@@ -43,9 +47,9 @@ const Banks = () => {
     e.preventDefault();
     try {
       if (editingBank) {
-        await updateBank(editingBank.id, formData);
+        await banksApi.update(editingBank.id, formData);
       } else {
-        await createBank(formData);
+        await banksApi.create(formData);
       }
       setShowModal(false);
       setEditingBank(null);
@@ -72,7 +76,7 @@ const Banks = () => {
   const handleDelete = async (bankId) => {
     if (window.confirm('Are you sure you want to delete this bank?')) {
       try {
-        await deleteBank(bankId);
+        await banksApi.delete(bankId);
         fetchBanks();
       } catch (err) {
         setError('Failed to delete bank');

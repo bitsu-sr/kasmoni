@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { getAnalytics } from '../services/api';
+import { analyticsApi } from '../services/api';
 import '../styles/Analytics.css';
 
 const Analytics = () => {
@@ -17,8 +17,12 @@ const Analytics = () => {
   const fetchAnalytics = async () => {
     try {
       setLoading(true);
-      const data = await getAnalytics(timeRange);
-      setAnalytics(data);
+      const response = await analyticsApi.getStats();
+      if (response.data && response.data.success) {
+        setAnalytics(response.data.data);
+      } else {
+        setAnalytics(null);
+      }
       setError(null);
     } catch (err) {
       setError('Failed to fetch analytics data');

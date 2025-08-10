@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { getUsers, createUser, updateUser, deleteUser, updateUserRole } from '../services/api';
+import { usersApi } from '../services/api';
 import '../styles/Users.css';
 
 const Users = () => {
@@ -32,8 +32,12 @@ const Users = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const data = await getUsers();
-      setUsers(data);
+      const response = await usersApi.getAll();
+      if (response.data && response.data.success) {
+        setUsers(response.data.data);
+      } else {
+        setUsers([]);
+      }
       setError(null);
     } catch (err) {
       setError('Failed to fetch users');
@@ -47,9 +51,9 @@ const Users = () => {
     e.preventDefault();
     try {
       if (editingUser) {
-        await updateUser(editingUser.id, formData);
+        await usersApi.update(editingUser.id, formData);
       } else {
-        await createUser(formData);
+        await usersApi.create(formData);
       }
       setShowModal(false);
       setEditingUser(null);
@@ -84,7 +88,7 @@ const Users = () => {
     
     if (window.confirm('Are you sure you want to delete this user?')) {
       try {
-        await deleteUser(userId);
+        await usersApi.delete(userId);
         fetchUsers();
       } catch (err) {
         setError('Failed to delete user');
@@ -95,7 +99,7 @@ const Users = () => {
 
   const handleRoleChange = async (userId, newRole) => {
     try {
-      await updateUserRole(userId, newRole);
+      await usersApi.update(userId, { role: newRole });
       fetchUsers();
     } catch (err) {
       setError('Failed to update user role');

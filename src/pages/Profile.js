@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { updateProfile, changePassword, uploadProfileImage } from '../services/api';
+import { usersApi } from '../services/api';
 import '../styles/Profile.css';
 
 const Profile = () => {
@@ -60,8 +60,10 @@ const Profile = () => {
     setSuccess(null);
 
     try {
-      const updatedUser = await updateProfile(profileData);
-      updateUser(updatedUser);
+      const response = await usersApi.update(user.id, profileData);
+      if (response.data && response.data.success) {
+        updateUser(response.data.data);
+      }
       setSuccess('Profile updated successfully!');
     } catch (err) {
       setError('Failed to update profile');
@@ -89,7 +91,7 @@ const Profile = () => {
     setSuccess(null);
 
     try {
-      await changePassword(passwordData);
+      await usersApi.changePassword(user.id, passwordData);
       setSuccess('Password changed successfully!');
       setPasswordData({
         currentPassword: '',

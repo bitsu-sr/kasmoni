@@ -1,0 +1,157 @@
+/* ArchivedPayments Page Styles */
+.archived-payments-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.archived-payments-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.archived-payments-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+}
+
+.restore-all-btn {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.restore-all-btn:hover {
+  background-color: #218838;
+}
+
+.archived-payments-filters {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.filter-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #666;
+}
+
+.filter-input,
+.filter-select {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  min-width: 150px;
+}
+
+.filter-input:focus,
+.filter-select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.archived-payments-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.archived-payments-table th,
+.archived-payments-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.archived-payments-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #495057;
+}
+
+.archived-payments-table tr:hover {
+  background-color: #f8f9fa;
+}
+
+.archived-payments-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.restore-btn,
+.delete-btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.restore-btn {
+  background-color: #28a745;
+  color: white;
+}
+
+.restore-btn:hover {
+  background-color: #218838;
+}
+
+.delete-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+.delete-btn:hover {
+  background-color: #c82333;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .archived-payments-container {
+    padding: 16px;
+  }
+  
+  .archived-payments-header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
+  
+  .archived-payments-filters {
+    flex-direction: column;
+  }
+  
+  .filter-input,
+  .filter-select {
+    min-width: 100%;
+  }
+  
+  .archived-payments-table {
+    font-size: 14px;
+  }
+  
+  .archived-payments-table th,
+  .archived-payments-table td {
+    padding: 8px 12px;
+  }
+}

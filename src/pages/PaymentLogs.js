@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { getPaymentLogs, getPaymentLogDetails, exportPaymentLogs } from '../services/api';
+import { paymentLogsApi } from '../services/api';
 import '../styles/PaymentLogs.css';
 
 const PaymentLogs = () => {
@@ -25,8 +25,12 @@ const PaymentLogs = () => {
   const fetchPaymentLogs = async () => {
     try {
       setLoading(true);
-      const data = await getPaymentLogs();
-      setPaymentLogs(data);
+      const response = await paymentLogsApi.getAll();
+      if (response.data && response.data.success) {
+        setPaymentLogs(response.data.data);
+      } else {
+        setPaymentLogs([]);
+      }
       setError(null);
     } catch (err) {
       setError('Failed to fetch payment logs');
@@ -38,8 +42,12 @@ const PaymentLogs = () => {
 
   const handleViewDetails = async (log) => {
     try {
-      const details = await getPaymentLogDetails(log.id);
-      setSelectedLog({ ...log, ...details });
+      const response = await paymentLogsApi.getById(log.id);
+      if (response.data && response.data.success) {
+        setSelectedLog({ ...log, ...response.data.data });
+      } else {
+        setSelectedLog(log);
+      }
       setShowDetailsModal(true);
     } catch (err) {
       setError('Failed to fetch log details');
@@ -50,12 +58,7 @@ const PaymentLogs = () => {
   const handleExport = async () => {
     setExporting(true);
     try {
-      await exportPaymentLogs({
-        status: filterStatus,
-        type: filterType,
-        dateRange: filterDateRange,
-        search: searchTerm
-      });
+      await paymentLogsApi.export('csv');
       setError(null);
     } catch (err) {
       setError('Failed to export payment logs');

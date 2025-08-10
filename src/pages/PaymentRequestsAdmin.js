@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { getPaymentRequests, approvePaymentRequest, rejectPaymentRequest, getPaymentRequestDetails } from '../services/api';
+import { paymentRequestsApi } from '../services/api';
 import '../styles/PaymentRequestsAdmin.css';
 
 const PaymentRequestsAdmin = () => {
@@ -23,8 +23,12 @@ const PaymentRequestsAdmin = () => {
   const fetchPaymentRequests = async () => {
     try {
       setLoading(true);
-      const data = await getPaymentRequests();
-      setPaymentRequests(data);
+      const response = await paymentRequestsApi.getAll();
+      if (response.data && response.data.success) {
+        setPaymentRequests(response.data.data);
+      } else {
+        setPaymentRequests([]);
+      }
       setError(null);
     } catch (err) {
       setError('Failed to fetch payment requests');
@@ -36,7 +40,7 @@ const PaymentRequestsAdmin = () => {
 
   const handleApprove = async (requestId) => {
     try {
-      await approvePaymentRequest(requestId);
+      await paymentRequestsApi.approve(requestId, {});
       fetchPaymentRequests();
       setError(null);
     } catch (err) {
@@ -50,7 +54,7 @@ const PaymentRequestsAdmin = () => {
     if (!rejectionReason) return;
 
     try {
-      await rejectPaymentRequest(requestId, rejectionReason);
+      await paymentRequestsApi.update(requestId, { status: 'rejected', rejectionReason });
       fetchPaymentRequests();
       setError(null);
     } catch (err) {
@@ -61,8 +65,12 @@ const PaymentRequestsAdmin = () => {
 
   const handleViewDetails = async (request) => {
     try {
-      const details = await getPaymentRequestDetails(request.id);
-      setSelectedRequest({ ...request, ...details });
+      const response = await paymentRequestsApi.getById(request.id);
+      if (response.data && response.data.success) {
+        setSelectedRequest({ ...request, ...response.data.data });
+      } else {
+        setSelectedRequest(request);
+      }
       setShowDetailsModal(true);
     } catch (err) {
       setError('Failed to fetch request details');

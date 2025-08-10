@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { getMessages, sendMessage, getConversations, markAsRead } from '../services/api';
+import { messagesApi } from '../services/api';
 import '../styles/Messages.css';
 
 const Messages = () => {
@@ -35,8 +35,12 @@ const Messages = () => {
   const fetchConversations = async () => {
     try {
       setLoading(true);
-      const data = await getConversations();
-      setConversations(data);
+      const response = await messagesApi.getAll();
+      if (response.data && response.data.success) {
+        setConversations(response.data.data);
+      } else {
+        setConversations([]);
+      }
       setError(null);
     } catch (err) {
       setError('Failed to fetch conversations');
@@ -48,10 +52,14 @@ const Messages = () => {
 
   const fetchMessages = async (conversationId) => {
     try {
-      const data = await getMessages(conversationId);
-      setMessages(data);
+      const response = await messagesApi.getByMemberId(conversationId);
+      if (response.data && response.data.success) {
+        setMessages(response.data.data);
+      } else {
+        setMessages([]);
+      }
       // Mark messages as read
-      await markAsRead(conversationId);
+      await messagesApi.markAsRead(conversationId);
     } catch (err) {
       setError('Failed to fetch messages');
       console.error('Messages error:', err);
@@ -69,7 +77,7 @@ const Messages = () => {
         senderId: user.id
       };
 
-      await sendMessage(messageData);
+      await messagesApi.create(messageData);
       setNewMessage('');
       // Refresh messages
       fetchMessages(selectedConversation.id);
